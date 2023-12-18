@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Mesures</title>
+    <style>
+
+        body {
+            background-image: url(./3409297.jpg);  
+            background-size: cover;  
+        
+        }
+
+        .container {
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            font-size: 32px;
+            color: white;
+            margin-top: 20px;
+            
+        }
+        .element {
+            width: 300px;
+            height: 300px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: #749a8a;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+        @media only screen and (max-width: 600px) {
+            .container {
+                flex-direction: column;
+                align-items: center;
+            }
+            .element {
+                width: 80%;
+                font-size: 24px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <h1 style="color: white; text-align: center;">Mesures</h1>
+    <div id="dataContainer" class="container"></div>
+
+    <script>
+        // Fonction pour récupérer les données depuis votre API toutes les minutes
+        function getDataAndUpdateUI() {
+            const apiKey = 'NNSXS.2NGNEVK2PKTUCIQ33JMV4GF635WR5TCWAFMCP5Y.O6UIY4YUGB3ALYQJBSPHMUXOFFI7I6FOUB62O4X7VBMWDU6STFSA';
+            const afterDate = '2023-12-18T14:00:00Z'; // Remplacez avec la date souhaitée
+        
+            fetch(`https://eu1.cloud.thethings.network/api/v3/as/applications/301-ziao-boye/devices/eui-70b3d57ed00620fa/packages/storage/uplink_message?limit=1&after=${afterDate}`, {
+                headers: {
+                    'Authorization': `Bearer ${apiKey}`,
+                    'Accept': 'application/json',
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log('Données reçues :', data);
+                displayData(data.result.uplink_message.decoded_payload);
+            })
+            .catch(error => console.error('Erreur lors de la récupération des données:', error));
+        }
+        
+
+        // Fonction pour afficher les données récupérées
+        function displayData(data) {
+            const dataContainer = document.getElementById('dataContainer');
+            dataContainer.innerHTML = ''; // Vider le conteneur
+
+            // Créer des éléments pour afficher les données
+            Object.keys(data).forEach(key => {
+                const element = document.createElement('div');
+                element.classList.add('element');
+                element.textContent = `${key}: ${data[key]}`;
+                dataContainer.appendChild(element);
+            });
+        }
+
+        // Appeler getDataAndUpdateUI toutes les minutes
+        getDataAndUpdateUI(); // Appel initial sans attendre 1 minute
+
+        setInterval(getDataAndUpdateUI, 60000); // 60000 millisecondes = 1 minute
+    </script>
+</body>
+</html>
